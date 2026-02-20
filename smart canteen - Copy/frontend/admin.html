@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Intelligence - HealthBite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="chatbot.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="chatbot.js" defer></script>
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-card i.bg-icon {
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            font-size: 80px;
+            opacity: 0.05;
+            color: #667eea;
+        }
+
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(210, 100%, 95%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(260, 100%, 96%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(220, 100%, 95%, 1) 0, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(270, 100%, 97%, 1) 0, transparent 50%);
+        }
+
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .risk-table th {
+            text-align: left;
+            padding: 15px 20px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .risk-table td {
+            padding: 15px 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .table-wrap {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .badge-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .badge-med {
+            background: #ffedd5;
+            color: #d97706;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #ffffff;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            background: var(--brand-primary);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 1024px) {
+            .admin-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: none;
+                /* No sidebar on this page */
+            }
+
+            main.main-content {
+                padding: 40px 20px;
+            }
+
+            .header-row h2 {
+                font-size: 28px;
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+                padding: 20px !important;
+            }
+
+            header div[style*="display: flex"] {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .risk-section-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-row h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <!-- Header -->
+        <header
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; background: rgba(255,255,255,0.95); padding: 25px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div
+                    style="width: 50px; height: 50px; background: #667eea; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div>
+                    <h1 style="color: #667eea; font-size: 24px; font-weight: 800; margin: 0;">Central Intelligence Panel
+                    </h1>
+                    <p style="color: #64748b; font-size: 13px; margin: 0;">System health: <span
+                            style="color: #00b894; font-weight: 700;">OPTIONAL</span></p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button onclick="logout()"
+                    style="background: #FF6B35; color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="admin-grid" id="stats-overview">
+            <div class="admin-card">
+                <i class="fas fa-shopping-cart bg-icon"></i>
+                <p style="color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800;">Orders Today
+                </p>
+                <h2 style="font-size: 32px; font-weight: 800; color: #1e293b;" id="stat-orders">--</h2>
+                <div style="color: #00b894; font-size: 12px; font-weight: 700; margin-top: 5px;"><i
+                        class="fas fa-arrow-up"></i> 12%</div>
+            </div>
+            <div class="admin-card">
+                <i class="fas fa-wallet bg-icon"></i>
+                <p style="color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800;">Revenue Today
+                </p>
+                <h2 style="font-size: 32px; font-weight: 800; color: #1e293b;" id="stat-revenue">--</h2>
+                <div style="color: #00b894; font-size: 12px; font-weight: 700; margin-top: 5px;"><i
+                        class="fas fa-arrow-up"></i> 8.5%</div>
+            </div>
+            <div class="admin-card">
+                <i class="fas fa-exclamation-triangle bg-icon" style="color: #dc2626;"></i>
+                <p style="color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800;">Risk Alerts</p>
+                <h2 style="font-size: 32px; font-weight: 800; color: #dc2626;" id="stat-risks">--</h2>
+                <div style="color: #dc2626; font-size: 12px; font-weight: 700; margin-top: 5px;">Critical Status</div>
+            </div>
+            <div class="admin-card">
+                <i class="fas fa-activity bg-icon"></i>
+                <p style="color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800;">System Health
+                </p>
+                <h2 style="font-size: 32px; font-weight: 800; color: #1e293b;" id="stat-health">--</h2>
+                <div style="color: #00b894; font-size: 12px; font-weight: 700; margin-top: 5px;">Optimal</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="risk-section-grid"
+        style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <!-- Risk Table -->
+        <div>
+            <h2 class="section-title"><i class="fas fa-flag"></i> High-Risk Food Flags</h2>
+            <table class="risk-table">
+                <thead>
+                    <tr>
+                        <th>Menu Item</th>
+                        <th>Flag Type</th>
+                        <th>Risk</th>
+                        <th>Detected</th>
+                    </tr>
+                </thead>
+                <tbody id="risk-flags-table">
+                    <!-- Rows will be added dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AI Model Stats -->
+        <div>
+            <h2 class="section-title"><i class="fas fa-brain"></i> System Intelligence</h2>
+            <div class="admin-card" style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-weight: 700; color: #1e293b;">ML Accuracy</span>
+                    <span style="color: #667eea; font-weight: 800;">94.2%</span>
+                </div>
+                <div style="height: 10px; background: #f1f5f9; border-radius: 10px; overflow: hidden;">
+                    <div style="width: 94%; height: 100%; background: #667eea;"></div>
+                </div>
+            </div>
+            <div class="admin-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-weight: 700; color: #1e293b;">API Uptime</span>
+                    <span style="color: #00b894; font-weight: 800;">99.9%</span>
+                </div>
+                <div style="height: 10px; background: #f1f5f9; border-radius: 10px; overflow: hidden;">
+                    <div style="width: 99.9%; height: 100%; background: #00b894;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Floating Chatbot Toggle -->
+    <div id="chatbot-toggle" onclick="toggleChatbot()"
+        style="position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000;">
+        <i class="fas fa-robot" style="font-size: 24px;"></i>
+    </div>
+
+    <!-- Script to load dynamic data -->
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check admin session
+            const session = checkSession();
+            if (!session || session.role !== 'ADMIN') {
+                window.location.href = 'index.html';
+                return;
+            }
+            loadAdminDashboard();
+        });
+
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+        async function loadAdminDashboard() {
+            const API_HOSTNAME = window.location.hostname || "127.0.0.1";
+            const API_ROOT = `http://${API_HOSTNAME}:8000/api`;
+            const token = localStorage.getItem('token');
+
+            try {
+                // Fetch Stats
+                const resStats = await fetch(`${API_ROOT}/admin/dashboard-stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const stats = await resStats.json();
+
+                document.getElementById('stat-orders').textContent = stats.orders_today.toLocaleString();
+                document.getElementById('stat-revenue').textContent = '₹' + stats.revenue_today.toLocaleString();
+                document.getElementById('stat-risks').textContent = stats.risk_alerts;
+                document.getElementById('stat-health').textContent = stats.system_health + '%';
+
+                // Fetch Risk Flags
+                const resFlags = await fetch(`${API_ROOT}/admin/risk-flags`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const flags = await resFlags.json();
+
+                const tableBody = document.getElementById('risk-flags-table');
+                tableBody.innerHTML = flags.map(f => `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <img src="${f.image}" style="width: 40px; height: 40px; border-radius: 8px; object-cover: cover;">
+                                <span style="font-weight: 700;">${f.item}</span>
+                            </div>
+                        </td>
+                        <td style="color: #475569;">${f.flag}</td>
+                        <td>
+                            <span class="badge ${f.risk === 'High' ? 'badge-high' : 'badge-med'}">${f.risk}</span>
+                        </td>
+                        <td style="color: #64748b; font-size: 13px;">${f.time}</td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error('Admin panel error:', err);
+            }
+        }
+    </script>
+</body>
+
+</html>
